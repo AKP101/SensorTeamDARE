@@ -2,7 +2,8 @@
 #include <Adafruit_TMP117.h>
 #include <Adafruit_Sensor.h>
 
-const int buttonPin = 2;
+const int buttonPin = 12;
+const int LED = 13;
 
 int buttonState = 0;
 bool startSensing = false;
@@ -11,7 +12,8 @@ bool shouldRecord = false;
 Adafruit_TMP117 tmp117;
 
 void setup() {
-  pinMode(buttonPin, INPUT);
+  pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(LED, OUTPUT);
 
   Serial.begin(115200);
   while (!Serial)
@@ -25,18 +27,16 @@ void setup() {
     }
   }
   Serial.println("TMP117 Found!");
-
-  Serial.println("Temperature,Time"); // Print CSV headers to serial terminal
 }
 
 void loop() {
   buttonState = digitalRead(buttonPin);
 
-  if (buttonState == HIGH && !startSensing) {
+  if (buttonState == LOW && !startSensing) {
     startSensing = true;
     shouldRecord = true;
     Serial.println("Sensing started");
-  } else if (buttonState == HIGH && startSensing) {
+  } else if (buttonState == LOW && startSensing) {
     startSensing = false;
     shouldRecord = false;
     Serial.println("Sensing stopped");
