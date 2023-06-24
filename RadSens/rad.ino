@@ -25,15 +25,14 @@ void setup() {
   }
 
   uint8_t sensorChipId = radSens.getChipId();
-  Serial.print("Chip id: 0x");
+  Serial.print("Chip ID: 0x");
   Serial.println(sensorChipId, HEX);
 
-  uint8_t firmWareVer = radSens.getFirmwareVersion();
+  uint8_t firmwareVer = radSens.getFirmwareVersion();
   Serial.print("Firmware version: ");
-  Serial.println(firmWareVer);
+  Serial.println(firmwareVer);
 
-  setSyncProvider(getTime);
-  setSyncInterval(60);
+  Serial.println("-------------------------------------");
 }
 
 void loop() {
