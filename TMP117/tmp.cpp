@@ -1,19 +1,19 @@
 #include <Wire.h>
 #include <Adafruit_TMP117.h>
 #include <Adafruit_Sensor.h>
+#include <TimeLib.h>
 
 const int buttonPin = 12;
 const int LED = 13;
 
 int buttonState = 0;
 bool startSensing = false;
-bool shouldRecord = false;
 
 Adafruit_TMP117 tmp117;
 
 void setup() {
-  pinMode(buttonPin, INPUT_PULLUP);
-  pinMode(LED, OUTPUT);
+  pinMode(buttonPin, INPUT);
+  digitalWrite(buttonPin, HIGH);
 
   Serial.begin(115200);
   while (!Serial)
@@ -30,15 +30,12 @@ void setup() {
 }
 
 void loop() {
-  buttonState = digitalRead(buttonPin);
 
-  if (buttonState == LOW && !startSensing) {
+  if (digitalRead(buttonPin) == LOW && !startSensing) {
     startSensing = true;
-    shouldRecord = true;
     Serial.println("Sensing started");
-  } else if (buttonState == LOW && startSensing) {
+  } else if (digitalRead(buttonPin) == LOW && startSensing) {
     startSensing = false;
-    shouldRecord = false;
     Serial.println("Sensing stopped");
   }
 
@@ -47,39 +44,16 @@ void loop() {
     tmp117.getEvent(&temp);
     Serial.print(temp.temperature); // Send temperature to serial terminal
     Serial.print(",");
-    Serial.println(getTimeStamp()); // Send timestamp to serial terminal
-
-    if (shouldRecord) {
-      // You can manually copy and save the received data from the serial terminal to a CSV file on your laptop
-      // Save the temperature and timestamp data to a CSV file on your laptop using a custom script or serial terminal program
-    }
+    printTimeStamp(); // Send timestamp to serial terminal
+    Serial.println();
   }
-
-  delay(100);
+  delay(500);
 }
 
-String getTimeStamp() {
-  String timeStamp = "";
-  timeStamp += String(year());
-  timeStamp += "-";
-  if (month() < 10)
-    timeStamp += "0";
-  timeStamp += String(month());
-  timeStamp += "-";
-  if (day() < 10)
-    timeStamp += "0";
-  timeStamp += String(day());
-  timeStamp += " ";
-  if (hour() < 10)
-    timeStamp += "0";
-  timeStamp += String(hour());
-  timeStamp += ":";
-  if (minute() < 10)
-    timeStamp += "0";
-  timeStamp += String(minute());
-  timeStamp += ":";
-  if (second() < 10)
-    timeStamp += "0";
-  timeStamp += String(second());
-  return timeStamp;
+void printTimeStamp() {
+  char timeStamp[20];
+  sprintf(timeStamp, "%02d:%02d:%02d", hour(), minute(), second());
+  Serial.print(timeStamp);
 }
+
+
