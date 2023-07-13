@@ -1,0 +1,102 @@
+ASSUMPTIONS
+1. x, y, z coordinates arbitrarily set for initial waypoint 
+(we choose the point where we start the flight path as the origin)
+2. Assuming sensor data as follows
+
+sensor_output.csv
+30 00:00:00
+32 00:00:30
+37 00:01:00
+34 00:01:30
+31 00:02:00
+26 00:02:30
+28 00:03:00
+temp hh:mm:ss
+
+waypoints read from screenshots
+A: start of cave or flight path
+B: 2m upwards from A
+C: 2m to the right of B
+A->B 2 2
+B->C 1 2
+path t d
+
+output_for_lidar.csv
+30 0 0   20
+32 0 0.5 20
+37 0 1   20
+34 0 1.5 20
+31 0 2   20
+26 1 2   20
+28 2 2   20
+temp x y z
+
+3. Assuming waypoints only move in one direction (x, y, z) at a time
+
+---------------------------
+PSUEDOCODE
+
+/* Just manually input waypoints.csv by hand from screenshot
+
+waypoints.csv
+A->B 0 2 0 2
+B->C 2 0 0 1
+path dx dy dz dt
+
+sensor_output.csv
+30 00:00:00
+32 00:00:30
+37 00:01:00
+34 00:01:30
+31 00:02:00
+26 00:02:30
+28 00:03:00
+temp hh:mm:ss
+
+// Sensor readings taken at a frequency of every 30 sec
+
+*/
+
+
+
+File input from waypoints.csv
+For point A, arbitrarily set the coordinates to be 0 0 20 (for 20 cm high)
+Using dy and dt, calculate the x y z coordinates every 30 secs
+	->SAMPLE OUTPUT
+	  0 0.5 20 00:00:30
+	  0 1   20 00:01:00
+	  0 1.5 20 00:01:30
+	  0 2   20 00:02:00
+
+File input from sensor_output.csv
+Match temperature and coordinate data using timestamps, delete time data
+	->COORDINATE 			TEMPERATURE		SAMPLE OUTPUT
+	  0 0.5 20 00:00:30		32 00:00:30		0 0.5 20 32
+	  0 1   20 00:01:00		37 00:01:00		0 1   20 37
+	  0 1.5 20 00:01:30		34 00:01:30		0 1.5 20 34
+	  0 2   20 00:02:00		31 00:02:00		0 2   20 31
+
+File output into output_for_lidar.csv
+	->SAMPLE OUTPUT
+	  32 0 0.5 20
+	  37 0 1   20
+	  34 0 1.5 20
+	  31 0 2   20
+
+
+
+
+****
+
+OR MORE COMPLICATED METHOD (Assumption 3 not needed)
+
+waypoints.csv
+A 0 0 20 00:00:00
+B 0 2 20 00:02:00
+C 2 2 20 00:03:00
+pt x y z hh:mm:ss
+
+Use vector math to calculate/interpolate points in between 
+(0 2 20) - (0 0 20) / 4
+
+
